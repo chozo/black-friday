@@ -53,7 +53,7 @@ npm run deploy         # ビルドして Cloudflare Workers へ公開
 ## 引き継ぎメモ（2026-11-26、Mac miniのClaude Codeへ）
 
 - **正本はここ**：Mac mini `~/lab/product/07_webgame/032_black_friday/app/`。ここが今後の開発の正本で、続きはMac miniのClaude Codeが担当する。開発元はMuse VM上のClaude Code（Museの指示・検証の下で制作）。ゲームカタログでは **No.032** になる予定。
-- **現在の状態**：2026-11-26 にユーザーの指示で公開した（v10 ＋ BGM・favicon・OGP。GitHub `chozo/black-friday`、`https://game.chozo.net/black-friday/`）。実機（iPhone）での試遊確認はまだ。
+- **現在の状態**：2026-11-26 にユーザーの指示で公開した（v10 ＋ BGM・favicon・OGP。GitHub `chozo/black-friday`、`https://game.chozo.net/black-friday/`）。スマホ実機での確認は 2026-11-26 に完了（ユーザー）。
 - **ローカル環境（Mac mini、2026-11-26 用意）**：`npm install` で three 0.187.0 と playwright-core を `app/node_modules` に入れる（`../tools` は不要。あればフォールバックとして使う）。`npm run dev` でビルドしてから `http://localhost:5173/` で配信する（同じWi-Fiのスマホは表示されるLANのIPで開ける）。ほかに `npm run build` / `npm test`（ロジック）/ `npm run test:screens`（画面テスト。インストール済みChromeをヘッドレスで使う）。
 - **BGM・favicon（2026-11-26 追加）**：ポップなBGMを Web Audio でその場で合成して鳴らす（外部の音源なし。`src/game.html` の「BGM」節、調整値は `BGM_BPM` / `BGM_BPM_STEP` / `BGM_VOL`）。曲は C→Am→F→G の8小節ループで、BPM 148 から1球ごとに +8（最大180）。スタートで鳴り始め、結果画面で止まり、もう一度で最初から。左下の音符ボタンか M キーでBGMだけオン／オフ（`localStorage` の `bf_bgm_off`）。タブが裏に回ると音を止める。BGM の音量は効果音よりおよそ 13〜15 dB 小さい（`__bf.renderBgm(秒)` で RMS を測れる）。favicon は `public/favicon.svg`（白いふち付きの黒い「金」、背景透過）で、ビルド時に data URI にして `index.html` に入れる（単一ファイルのまま）。テスト用に `__bf.bgm()` / `__bf.setBgmMuted(m)` / `__bf.renderBgm(sec, thrown)` を追加。
 - **OGP画像（2026-11-26 追加）**：`public/ogp.png`（1200×630）。`npm run ogp`（`tools/ogp/make-ogp.mjs`）で、実際のゲームを `window.__bf` で角度・ゲージ固定のまま「金」と「日」の端に4球投げた場面（文字が読めるまま端だけ黒い。塗り率 約12%）を撮り、ポップな集中線・水玉・しぶき・値札と、タイトル・遊び方の一言・公開URLを重ねて作り直せる（しぶきの粒以外は毎回ほぼ同じ絵）。公開URLの slug は `black-friday`（2026-11-26 確定、`https://game.chozo.net/black-friday/`）。変える場合は `tools/ogp/make-ogp.mjs` の `SLUG` と `src/game.html` の `og:url` / `og:image` を直して `npm run ogp` → `npm run build`。公開時は `public/` の `favicon.svg` と `ogp.png` を `<slug>/` 直下に置く。
@@ -62,7 +62,7 @@ npm run deploy         # ビルドして Cloudflare Workers へ公開
 - **絶対に守る地雷**：JS文字列の中に `<a href=` を書かないこと。Museアプリのプレビューが真っ黒になる既知の問題で、build.jsが検出して失敗させる。
 - **テスト用フック**：`window.__bf`（state/start/retry/aim/throwBall/setRotation/getGauge/setGauge/unpinGauge/locked/lastThrowGauge 等）。画面テストはこれを使う。
 - **ユーザー決定済みのルール（勝手に変えない）**：文字は縦積み（金／曜／日）；回転は1球ごとに2倍（0.55→1.10→2.20→4.40→8.80 rad/s）；塗り範囲はゲージで決まり、判定は「投げる」ボタンを押した瞬間（v6〜）、投げた瞬間にゲージは凍結して着弾後しばらく止まったまま、次球の照準開始で凍結値から再開（v7〜）；ゲージ速度は全ボール固定で周期 約0.933秒＝旧3球目の速さ（v9〜）；ゲージの大小は色ではなく大きさで表現（帯は上太・下細のテーパー、マーカー直径は範囲割合に比例、最大26px⇔最小6.5px）（v8〜）；タイトルは「黒に塗りつぶせ」、BLACK FRIDAYは大きな金文字、遊び方は3ステップ図解（v10〜）。
-- **未確認事項**：実機（iPhone）でのタッチ感・フレームレート・音は未確認。特に5球目の回転8.80 rad/sとゲージ周期0.933秒の体感はユーザーの試遊待ち。
+- **実機確認**：2026-11-26 にユーザーがスマホ実機で確認済み（タッチ・フレームレート・BGMと効果音・5球目の速さを含む）。
 - **記録**：Notion「ゲームアイデア」DBのレコード名は「金曜日、黒く塗れ」。仕様変更をしたらDB記録への反映もセット（ユーザーとの約束）。
 - 旧バージョンのバックアップ（v1_backup〜v9_backup）は開発元VMにのみあり、ここには移していない。必要ならユーザー経由で Muse に頼むこと。
 
@@ -115,7 +115,14 @@ Built from `SPEC.md`. Open `index.html` directly: it's a single self-contained f
 - v5 also fixes an older display bug: after retry, the HUD kept showing the previous game's coverage % until the next hit, because the animated counter reset to 0 without redrawing.
 - v1 sources are kept in `v1_backup/`, v4 sources in `v4_backup/`, v5 sources in `v5_backup/`, v6 sources (plus the v6 README and tests) in `v6_backup/`, v7 in `v7_backup/` and v8 (sources, tests, README) in `v8_backup/` for comparison.
 
-## Test results (v10)
+## Test results (2026-11-26, Mac mini, after BGM / favicon / OGP / promo hooks)
+- Logic tests (Node): **84 passed, 0 failed**.
+- Screen tests (`npm run test:screens`, installed Chrome headless with SwiftShader): **81 passed, 2 failed** (log: `tests/tmp/screens_2026-11-26.log`, not in Git).
+  - `gauge pinned at 1: first hit coverage ≈ v4 (~26%)` → 23% here.
+  - `same spot ×5: balls 2–5 are wasted` → history +813 +54 +0 +0 +0 (ball 2 still adds a few blocks).
+  - **Cause: the system font, not a code change.** The letters are voxelised from the system font (`glyphBitmap`). This Mac uses Hiragino; the maker's Linux VM used a different CJK font, so the letter shapes differ slightly (e.g. the edge-on hit paints 441 blocks here vs 433 on the VM; the surface count is 3428 here). Both checks hard-code numbers measured on the VM. Running the same steps on the v10 build from before today's changes gives exactly the same numbers on this Mac (first hit 23%; same spot 25%, +813 +49 +0 +0 +0), so today's changes did not cause them. The thresholds were left as they are.
+- Real device: the user checked the game on a phone on 2026-11-26 (touch, frame rate, BGM and sound effects, ball 5 speed).
+
 
 Operator re-verification (Muse, 2026-11-26): logic **84 passed, 0 failed**; screen **83 passed, 0 failed** (`tests/tmp/screens_v10_muse.log`; the maker's run1 was cut off by a session timeout after all title checks had passed). Title: BLACK FRIDAY 46.0 px across the full 390 px width at the top, 「黒に塗りつぶせ」 49.9 px headline below it; how-to = 3 inline-SVG steps (72 px tall) with 14 px captions, 5 ball dots in step 1, everything fits the 9:16 frame with the letters between headings and how-to (zoom 0.740). Operator visually confirmed `tests/screenshots/01_title.png` and `01b_howto_crop.png`. Gameplay unchanged from v9; natural run 17 → 19 → 25 → 35 → 56%, 「56% OFF」.
 
@@ -188,6 +195,9 @@ Verified by Muse (the operator) on 2026-11-24, re-running both suites independen
 - Note: the build session's own final screen run was cut short when its time budget ended (browser closed at throw 5); the full pass above is the operator's re-run of the same `tests/screens.js` against the shipped `index.html` (built 07:19, unchanged since).
 
 ## Unverified
+
+> **2026-11-26 更新**：スマホ実機での確認はユーザーが完了した（タッチの感触・フレームレート・音・5球目の速さを含む）。下の項目はヘッドレスの試験の限界を記録として残している。
+
 - Real-device (iPhone) touch feel, frame rate, and sound. Headless rendering here is software WebGL at ~1 fps, so performance on a real GPU is expected to be much better but is not measured.
 - Layout: the letters stay stacked vertically （金／曜／日）. The user confirmed this in the v2 playtest feedback.
 - Whether the v5 rotation feels right on a real phone at full frame rate. At 8.80 rad/s the 5th ball sees a full turn every ~0.71 s, and the letters turn ~6.6 rad (≈ 1 turn) during the 0.75 s flight. Whether the gauge is readable and fair at its constant 0.933 s per cycle (v9) is also unchecked. Headless tests check the numbers, not the feel.
