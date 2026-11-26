@@ -22,12 +22,21 @@ npm run build          # src/ から index.html（単一ファイル）と dist/
 npm test               # ロジックテスト（Node）
 npm run test:screens   # 画面テスト（インストール済みChromeをヘッドレスで使う。20分以上かかる）
 npm run ogp            # OGP画像 public/ogp.png を作り直す
+npm run promo          # 告知動画（縦型 1080×1920・約30秒）を撮って ../video/ に書き出す
 npm run deploy         # ビルドして Cloudflare Workers へ公開
 ```
 
 - 公開先は Cloudflare Workers + Static Assets（Worker 名 `black-friday`、ルート `game.chozo.net/black-friday` と `game.chozo.net/black-friday/*`、workers.dev は使わない）。`dist/black-friday/` に `index.html`・`favicon.svg`・`ogp.png` が入る。
 - `public/` の中身（`favicon.svg`・`ogp.png`）はビルドで `dist/black-friday/` 直下にコピーされる。favicon はさらに data URI として `index.html` にも埋め込む。
 - ルートの `index.html` はビルドの生成物（Git には入れない）。
+
+### 告知動画
+
+- `npm run promo` で、ビルド → BGM の書き出し（`tools/promo/make-bgm.mjs`）→ 撮影と書き出し（`tools/promo/record.mjs`）を行う。台本は `tools/promo/scenario.mjs`、見た目は `tools/promo/promo.css`、タイトルの絵は `tools/promo/title.svg`。
+- 出力は `../video/black-friday-promo.mp4`（1080×1920、30fps、約29.6秒、-14 LUFS）、表紙 `black-friday-promo-cover.jpg`、確認用の一覧 `black-friday-promo-sheet.jpg`。動画と `../video/work/` はリポジトリに入れない。
+- `PROMO_EVERY=15 npm run promo` で15コマおきの一覧（`black-friday-promo-preview.jpg`、赤い領域はショート動画アプリの表示が重なる場所）だけを作って構成を確かめられる。`PROMO_ENCODE_ONLY=1 PROMO_SCENARIO=scenario.mjs node tools/promo/record.mjs` で撮り直さずに音だけ書き出し直せる。
+- 実際のゲームを `window.__game`（`manual` / `step` / `state` / `touchDown`・`touchMove`・`touchUp` / `throwBall` / `drainEvents` / `audio.capture`・`drain`・`render` / `renderBgmPcm`）で1コマずつ進めて撮る。効果音は記録して OfflineAudioContext で鳴らし直す。BGM はゲームと同じ曲を BPM 164 一定で16小節書き出してくり返す（外部の音源なし）。BGM は効果音よりおよそ13dB小さい（`config.music.volume` 0.22）。
+- 照準は文字の回転軸（横の真ん中）に合わせるので、回転が速くなっても当たる。称号が出る結果画面は映さず、終わる直前の塗り率を「◯% OFF ゲット！」として見せる。
 
 ## ライセンス
 

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="250" viewBox="0 0 500 250">
+  <style>text { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif; font-weight: 900; font-size: 100px; paint-order: stroke fill; stroke-linejoin: round; }</style>
+  <!-- ピンクの影 -->
+  <g transform="translate(8 10)" fill="#ff3d6e" stroke="#ff3d6e" stroke-width="20">
+    <text x="250" y="105" text-anchor="middle">黒に</text>
+    <text x="250" y="225" text-anchor="middle">塗りつぶせ</text>
+  </g>
+  <!-- 本体：「黒」は黒い字に金のふち、ほかは白い字に黒いふち -->
+  <g stroke-width="20">
+    <text x="250" y="105" text-anchor="middle"><tspan fill="#0b0b0b" stroke="#ffd93b">黒</tspan><tspan fill="#fff" stroke="#111">に</tspan></text>
+    <text x="250" y="225" text-anchor="middle" fill="#fff" stroke="#111">塗りつぶせ</text>
+  </g>
+</svg>
