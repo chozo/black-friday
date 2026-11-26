@@ -1,0 +1,21 @@
+{
+  "name": "black-friday",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "黒に塗りつぶせ：ボールを投げて金色の「金曜日」を黒く塗る、ブラックフライデーのミニゲーム",
+  "scripts": {
+    "dev": "node build.js && node tools/serve.mjs",
+    "serve": "node tools/serve.mjs",
+    "build": "node build.js",
+    "test": "node --test tests/logic.test.js",
+    "test:screens": "node tests/screens.js",
+    "ogp": "node tools/ogp/make-ogp.mjs",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.49.0",
+    "three": "0.187.0",
+    "wrangler": "^4.168.0"
+  }
+}
